@@ -34,7 +34,7 @@ func (h handler) CreateInvoice(c *fiber.Ctx) error {
 
 func (h handler) GetInvoice(c *fiber.Ctx) error {
 
-	var id string
+	var id int
 	var invoice models.Invoice
 
 	err := h.DB.Model(&models.Invoice{}).Where("id = ?", id).Preload("Bids.Investor").First(&invoice).Error

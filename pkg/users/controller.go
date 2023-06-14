@@ -12,7 +12,7 @@ type handler struct {
 }
 
 func (h handler) GetIssuer(c *fiber.Ctx) error {
-	var id string
+	var id int
 	var user models.User
 
 	err := h.DB.Model(&models.Invoice{}).Where("id = ? AND usertype", id, "issuer").First(&user).Error
