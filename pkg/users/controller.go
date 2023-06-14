@@ -15,7 +15,7 @@ func (h handler) GetIssuer(c *fiber.Ctx) error {
 	var id int
 	var user models.User
 
-	err := h.DB.Model(&models.Invoice{}).Where("id = ? AND usertype", id, "issuer").First(&user).Error
+	err := h.DB.Model(&models.Invoice{}).Where("id = ? AND user_type = ?", id, "issuer").First(&user).Error
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, err.Error())
 	}
@@ -25,7 +25,7 @@ func (h handler) GetIssuer(c *fiber.Ctx) error {
 func (h handler) GetInvestors(c *fiber.Ctx) error {
 	var users []models.User
 
-	err := h.DB.Model(&models.Invoice{}).Where("usertype = ?", "investor").Find(&users).Error
+	err := h.DB.Model(&models.Invoice{}).Where("user_type = ?", "investor").Find(&users).Error
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, err.Error())
 	}

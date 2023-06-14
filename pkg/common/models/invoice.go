@@ -9,10 +9,9 @@ type Invoice struct {
 	Amount      float64 `json:"amount"`
 	AmountBided float64 `json:"amount_bided"`
 	IssuerId    int     `json:"issuer_id"`
-	InvoiceDate string  `json:"invoice_date"`
 	Reference   string  `json:"reference"`
 	Status      string  `json:"status"`
-	Bids        []Bid   `json:"bids"`
+	Bids        []Bid   `gorm:"constraint:OnUpdate:CASCADE" json:"bids"`
 }
 
 type CreateInvoiceDto struct {

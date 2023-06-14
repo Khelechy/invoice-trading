@@ -9,5 +9,11 @@ type Bid struct {
 	Amount     float64 `json:"amount"`
 	InvoiceId  int     `json:"invoice_id"`
 	InvestorId int     `json:"investor_id"`
-	Investor   User    `json:"investor"`
+	Investor   User    `gorm:"foreignKey:InvestorId;" json:"investor"`
+}
+
+type PlaceBid struct {
+	Amount     float64 `json:"amount"`
+	InvoiceId  int     `json:"invoice_id"`
+	InvestorId int     `json:"investor_id"`
 }
