@@ -20,10 +20,21 @@ func CreateUser(db *gorm.DB, user User) (uint, error) {
 	return user.ID, nil
 }
 
-func GetIssuer(db *gorm.DB, issuerId string) (*User, error){
+func GetIssuer(db *gorm.DB, issuerId string) (*User, error) {
 	var user User
 
 	err := db.Model(&User{}).Where("id = ? AND user_type = ?", issuerId, "issuer").First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func GetInvestor(db *gorm.DB, investorId string) (*User, error) {
+	var user User
+
+	err := db.Model(&User{}).Where("id = ? AND user_type = ?", investorId, "investor").First(&user).Error
 	if err != nil {
 		return nil, err
 	}
