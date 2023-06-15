@@ -30,18 +30,19 @@ func (h handler) CreateUser(c *fiber.Ctx) error {
 	}
 
 	// insert new db entry
-	if result := h.DB.Create(&user); result.Error != nil {
-		return fiber.NewError(fiber.StatusNotFound, result.Error.Error())
+	id, err := models.CreateUser(h.DB, user)
+	if err != nil {
+		return fiber.NewError(fiber.StatusNotFound, err.Error())
 	}
+
+	user.ID = id
 
 	return c.Status(fiber.StatusCreated).JSON(&user)
 }
 
 func (h handler) GetIssuer(c *fiber.Ctx) error {
 	id := c.Params("id")
-	var user models.User
-
-	err := h.DB.Model(&models.User{}).Where("id = ? AND user_type = ?", id, "issuer").First(&user).Error
+	user, err := models.GetIssuer(h.DB, id)
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, err.Error())
 	}
@@ -49,11 +50,9 @@ func (h handler) GetIssuer(c *fiber.Ctx) error {
 }
 
 func (h handler) GetInvestors(c *fiber.Ctx) error {
-	var users []models.User
-
-	err := h.DB.Model(&models.User{}).Where("user_type = ?", "investor").Find(&users).Error
+	users, err := models.GetInvestors(h.DB)
 	if err != nil {
-		return fiber.NewError(fiber.StatusNotFound, err.Error())
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 	return c.Status(fiber.StatusOK).JSON(&users)
 }
