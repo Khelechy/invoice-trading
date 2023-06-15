@@ -11,12 +11,14 @@ import (
 )
 
 type handler struct {
-	DB *gorm.DB
+	DB      *gorm.DB
+	JobChan chan models.Bid
 }
 
-func RegisterRoutes(app *fiber.App, db *gorm.DB) {
+func RegisterRoutes(app *fiber.App, db *gorm.DB, jobChan chan models.Bid) {
 	h := &handler{
-		DB: db,
+		DB:      db,
+		JobChan: jobChan,
 	}
 
 	routes := app.Group("/invoices")
@@ -118,15 +120,7 @@ func (h handler) PlaceBid(c *fiber.Ctx) error {
 	bidRequest.Amount = amountToBid
 
 	//Push bid request to queue
-
-	//TODO
-	//Create Bid Model
-	//Push to queue
-	//In processing
-	//Lock thread
-	//Read invoice again from db
-	//
-	processBid(h.DB, bidRequest)
+	h.JobChan <- bidRequest
 
 	return c.Status(fiber.StatusOK).JSON("Bid placed successfully")
 
@@ -191,12 +185,14 @@ func (h handler) UpdateTrade(c *fiber.Ctx) error {
 			invoice.Status = "rejected"
 			h.DB.Save(&invoice)
 		}
+	} else {
+		return c.Status(fiber.StatusBadRequest).JSON("Trade has already been closed")
 	}
 
-	return c.Status(fiber.StatusBadRequest).JSON("Trade has already been closed")
+	return c.Status(fiber.StatusBadRequest).JSON("Trade has already been updated")
 }
 
-func processBid(db *gorm.DB, bidRequest models.Bid) {
+func ProcessBid(db *gorm.DB, bidRequest models.Bid) {
 	//lock thread
 
 	//revalidate invoice status
