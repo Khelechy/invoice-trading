@@ -6,14 +6,14 @@ import (
 
 type Bid struct {
 	gorm.Model
-	Amount     float64 `json:"amount"`
-	InvoiceId  int     `json:"invoice_id"`
-	InvestorId int     `json:"investor_id"`
+	Amount     int `json:"amount"`
+	InvoiceId  uint     `json:"invoice_id"`
+	InvestorId uint     `json:"investor_id"`
 	Investor   User    `gorm:"foreignKey:InvestorId;" json:"investor"`
 }
 
 type PlaceBid struct {
-	Amount     float64 `json:"amount"`
-	InvoiceId  int     `json:"invoice_id"`
-	InvestorId int     `json:"investor_id"`
+	Amount     int `json:"amount"`
+	InvoiceId  uint     `json:"invoice_id"`
+	InvestorId uint     `json:"investor_id"`
 }

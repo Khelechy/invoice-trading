@@ -6,15 +6,15 @@ import (
 
 type Invoice struct {
 	gorm.Model
-	Amount      float64 `json:"amount"`
-	AmountBided float64 `json:"amount_bided"`
-	IssuerId    int     `json:"issuer_id"`
+	Amount      int `json:"amount"`
+	AmountBided int `json:"amount_bided"`
+	IssuerId    uint     `json:"issuer_id"`
 	Reference   string  `json:"reference"`
 	Status      string  `json:"status"`
 	Bids        []Bid   `gorm:"constraint:OnUpdate:CASCADE" json:"bids"`
 }
 
 type CreateInvoiceDto struct {
-	Amount   float64 `json:"amount"`
-	IssuerId int     `json:"issuer_id"`
+	Amount   int `json:"amount"`
+	IssuerId uint     `json:"issuer_id"`
 }

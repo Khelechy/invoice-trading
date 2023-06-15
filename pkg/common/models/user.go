@@ -6,6 +6,7 @@ import (
 
 type User struct {
 	gorm.Model
-	Balance      float64 `json:"amount"`
-	UserType    string  `json:"user_type"`
+	Name     string `json:"name"`
+	Balance  int    `json:"balance"`
+	UserType string `json:"user_type"`
 }
