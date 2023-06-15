@@ -100,11 +100,22 @@ func (h handler) PlaceBid(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "Sorry you cant trade this invoice")
 	}
 
+	//Trim bidrequest if amount is above available invoice bid-able
+
+	totalAmount := invoice.Amount
+	amountBided := invoice.AmountBided
+	availableToBid := totalAmount - amountBided
+	amountToBid := body.Amount
+
+	if amountToBid > availableToBid {
+		amountToBid = availableToBid
+	}
+
 	//Build bid
 	var bidRequest models.Bid
 	bidRequest.InvestorId = investor.ID
 	bidRequest.InvoiceId = invoice.ID
-	bidRequest.Amount = body.Amount
+	bidRequest.Amount = amountToBid
 
 	//Push bid request to queue
 
@@ -217,7 +228,7 @@ func processBid(db *gorm.DB, bidRequest models.Bid) {
 
 	//Update investor balance
 	investor.Balance -= bidRequest.Amount
-	db.Debug().Save(&investor)
+	db.Save(&investor)
 
 	//Update invoice record
 	invoice.AmountBided += bidRequest.Amount
@@ -228,7 +239,7 @@ func processBid(db *gorm.DB, bidRequest models.Bid) {
 		invoice.Status = "locked"
 	}
 
-	db.Debug().Save(&invoice)
+	db.Save(&invoice)
 
 	//unlock thread
 
