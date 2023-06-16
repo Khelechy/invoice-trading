@@ -32,6 +32,13 @@ func refreshUserTable() {
 	db.Migrator().CreateTable(&User{})
 }
 
+func refreshInvoiceTable(){
+	db.Migrator().DropTable(&Invoice{})
+	db.Migrator().CreateTable(&Invoice{})
+	db.Migrator().DropTable(&Bid{})
+	db.Migrator().CreateTable(&Bid{})
+}
+
 func seedInvestorandIssuer() (*User, *User, error) {
 	investor := User{
 		Name:     "Kelechi",
@@ -86,4 +93,20 @@ func seedInvestors() (*User, *User, error) {
 	}
 
 	return &investor1, &investor2, nil
+}
+
+func seedInvoice(){
+	_, issuer, _ := seedInvestorandIssuer()
+
+	invoice := Invoice{
+		Amount: 2000,
+		IssuerId: issuer.ID,
+		Reference: "somerandomstring",
+	}
+
+	err := db.Model(&Invoice{}).Create(&invoice).Error
+
+	if err != nil {
+		log.Fatal("cannot seed invoice")
+	}
 }
