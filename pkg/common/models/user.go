@@ -11,16 +11,16 @@ type User struct {
 	UserType string `json:"user_type"`
 }
 
-func CreateUser(db *gorm.DB, user User) (uint, error) {
+func CreateUser(db *gorm.DB, user User) (*User, error) {
 	result := db.Create(&user)
 	if result.Error != nil {
-		return 0, result.Error
+		return nil, result.Error
 	}
 
-	return user.ID, nil
+	return &user, nil
 }
 
-func GetIssuer(db *gorm.DB, issuerId string) (*User, error) {
+func GetIssuer(db *gorm.DB, issuerId uint) (*User, error) {
 	var user User
 
 	err := db.Model(&User{}).Where("id = ? AND user_type = ?", issuerId, "issuer").First(&user).Error
@@ -31,7 +31,7 @@ func GetIssuer(db *gorm.DB, issuerId string) (*User, error) {
 	return &user, nil
 }
 
-func GetInvestor(db *gorm.DB, investorId string) (*User, error) {
+func GetInvestor(db *gorm.DB, investorId uint) (*User, error) {
 	var user User
 
 	err := db.Model(&User{}).Where("id = ? AND user_type = ?", investorId, "investor").First(&user).Error

@@ -1,6 +1,7 @@
 package invoices
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 
@@ -43,28 +44,29 @@ func (h handler) CreateInvoice(c *fiber.Ctx) error {
 	invoice.IssuerId = body.IssuerId
 	invoice.Reference = "somerandomstring"
 
-	var issId string = strconv.FormatUint(uint64(invoice.IssuerId), 10)
-	_, err := models.GetIssuer(h.DB, issId)
+	_, err := models.GetIssuer(h.DB, invoice.IssuerId)
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, err.Error())
 	}
 
 	// insert new db entry
-	id, err := models.CreateInvoice(h.DB, invoice)
+	newInvoice, err := models.CreateInvoice(h.DB, invoice)
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, err.Error())
 	}
 
-	invoice.ID = id
-
-	return c.Status(fiber.StatusCreated).JSON(&invoice)
+	return c.Status(fiber.StatusCreated).JSON(&newInvoice)
 }
 
 func (h handler) GetInvoice(c *fiber.Ctx) error {
 
 	id := c.Params("id")
+	invoiceId, err := strconv.ParseUint(id, 10, 32)
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	invoice, err := models.GetInvoice(h.DB, id)
+	invoice, err := models.GetInvoice(h.DB, uint(invoiceId))
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, err.Error())
 	}
@@ -81,8 +83,7 @@ func (h handler) PlaceBid(c *fiber.Ctx) error {
 
 	//Validate sufficient funds for investor
 
-	var invId string = strconv.FormatUint(uint64(body.InvestorId), 10)
-	investor, err := models.GetInvestor(h.DB, invId)
+	investor, err := models.GetInvestor(h.DB, body.InvestorId)
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, err.Error())
 	}
@@ -92,8 +93,7 @@ func (h handler) PlaceBid(c *fiber.Ctx) error {
 	}
 
 	//Validate Invoice exists
-	var invoiceId string = strconv.FormatUint(uint64(body.InvoiceId), 10)
-	invoice, err := models.GetInvoice(h.DB, invoiceId)
+	invoice, err := models.GetInvoice(h.DB, body.InvoiceId)
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, err.Error())
 	}
@@ -129,13 +129,18 @@ func (h handler) PlaceBid(c *fiber.Ctx) error {
 func (h handler) UpdateTrade(c *fiber.Ctx) error {
 	id := c.Params("id")
 
+	invoiceId, err := strconv.ParseUint(id, 10, 32)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	queryValue := c.Query("action")
 
 	if queryValue == "" {
 		return fiber.NewError(fiber.StatusNotFound, "No action added")
 	}
 
-	invoice, err := models.GetInvoice(h.DB, id)
+	invoice, err := models.GetInvoice(h.DB, uint(invoiceId))
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, err.Error())
 	}
@@ -154,9 +159,7 @@ func (h handler) UpdateTrade(c *fiber.Ctx) error {
 		if updateFlag == "approve" {
 
 			// Get Issuer's account and impact balance
-
-			var issId string = strconv.FormatUint(uint64(invoice.IssuerId), 10)
-			issuer, err := models.GetIssuer(h.DB, issId)
+			issuer, err := models.GetIssuer(h.DB, invoice.IssuerId)
 			if err != nil {
 				return fiber.NewError(fiber.StatusNotFound, err.Error())
 			}
@@ -175,9 +178,7 @@ func (h handler) UpdateTrade(c *fiber.Ctx) error {
 			}
 
 			for i := 0; i < len(invoice.Bids); i++ {
-
-				var invId string = strconv.FormatUint(uint64(invoice.Bids[i].Investor.ID), 10)
-				investor, _ := models.GetInvestor(h.DB, invId)
+				investor, _ := models.GetInvestor(h.DB, invoice.Bids[i].Investor.ID)
 				investor.Balance += invoice.Bids[i].Amount
 				h.DB.Save(&investor)
 			}
@@ -196,8 +197,7 @@ func ProcessBid(db *gorm.DB, bidRequest models.Bid) {
 	//lock thread
 
 	//revalidate invoice status
-	var invoiceId string = strconv.FormatUint(uint64(bidRequest.InvoiceId), 10)
-	invoice, err := models.GetInvoice(db, invoiceId)
+	invoice, err := models.GetInvoice(db, bidRequest.InvoiceId)
 	if err != nil {
 		return
 	}
@@ -207,8 +207,7 @@ func ProcessBid(db *gorm.DB, bidRequest models.Bid) {
 	}
 
 	//revalidate balance
-	var invId string = strconv.FormatUint(uint64(bidRequest.InvestorId), 10)
-	investor, err := models.GetInvestor(db, invId)
+	investor, err := models.GetInvestor(db, bidRequest.InvestorId)
 	if err != nil {
 		return
 	}

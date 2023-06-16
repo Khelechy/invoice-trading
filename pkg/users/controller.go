@@ -1,6 +1,9 @@
 package users
 
 import (
+	"fmt"
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/khelechy/invoice-trading/pkg/common/models"
 
@@ -30,19 +33,23 @@ func (h handler) CreateUser(c *fiber.Ctx) error {
 	}
 
 	// insert new db entry
-	id, err := models.CreateUser(h.DB, user)
+	newUser, err := models.CreateUser(h.DB, user)
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, err.Error())
 	}
 
-	user.ID = id
-
-	return c.Status(fiber.StatusCreated).JSON(&user)
+	return c.Status(fiber.StatusCreated).JSON(&newUser)
 }
 
 func (h handler) GetIssuer(c *fiber.Ctx) error {
 	id := c.Params("id")
-	user, err := models.GetIssuer(h.DB, id)
+
+	userId, err := strconv.ParseUint(id, 10, 32)
+	if err != nil {
+		fmt.Println(err)
+	}
+	
+	user, err := models.GetIssuer(h.DB, uint(userId))
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, err.Error())
 	}

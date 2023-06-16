@@ -19,16 +19,16 @@ type CreateInvoiceDto struct {
 	IssuerId uint `json:"issuer_id"`
 }
 
-func CreateInvoice(db *gorm.DB, invoice Invoice) (uint, error) {
+func CreateInvoice(db *gorm.DB, invoice Invoice) (*Invoice, error) {
 	result := db.Create(&invoice)
 	if result.Error != nil {
-		return 0, result.Error
+		return nil, result.Error
 	}
 
-	return invoice.ID, nil
+	return &invoice, nil
 }
 
-func GetInvoice(db *gorm.DB, id string) (*Invoice, error) {
+func GetInvoice(db *gorm.DB, id uint) (*Invoice, error) {
 	var invoice Invoice
 
 	err := db.Model(&Invoice{}).Where("id = ?", id).Preload("Bids.Investor").First(&invoice).Error
