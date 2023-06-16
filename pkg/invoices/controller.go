@@ -190,7 +190,7 @@ func (h handler) UpdateTrade(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON("Trade has already been closed")
 	}
 
-	return c.Status(fiber.StatusBadRequest).JSON("Trade has already been updated")
+	return c.Status(fiber.StatusBadRequest).JSON("Trade has been updated")
 }
 
 func ProcessBid(db *gorm.DB, bidRequest models.Bid) {
