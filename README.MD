@@ -17,7 +17,7 @@
  ### Simulating a successful Invoice trading flow
 
  Call the following endpoints 
- Postman collection: 
+ Postman collection: https://documenter.getpostman.com/view/23691891/2s93sjUomm
 
 ### Create Two users, Investor and Issuer 
 
@@ -42,21 +42,11 @@
 
 ** "user_type" takes two values "issuer" and "investor" **
 
-##### Create Invoice 
- http://127.0.0.1:3000/invoices/
-
- ```json
- {
-    "amount": 500,
-    "issuer_id": 2
-}
-```
-
 #### User management endpoints
 
 ##### Get All Investors and Balance
 
- http://127.0.0.1:3000/users/investors
+ http://127.0.0.1:3000/users/investors `GET`
 
  ```json
  [
@@ -82,7 +72,7 @@
  ```
 
  #### Get Back an Issuer
-  http://127.0.0.1:3000/users/issuers/2
+  http://127.0.0.1:3000/users/issuers/2 `GET`
 
   ```json
   {
@@ -96,9 +86,19 @@
 }
   ```
 
+##### Create Invoice 
+ http://127.0.0.1:3000/invoices/ `POST`
+
+ ```json
+ {
+    "amount": 500,
+    "issuer_id": 2
+}
+```
+
 
 ##### Place Bid 
- http://127.0.0.1:3000/invoices/bid
+ http://127.0.0.1:3000/invoices/bid `POST`
  
  ```json
  {
@@ -109,7 +109,7 @@
 ```
 
 #### Fetch Back Invoice,status and associated bids
- http://127.0.0.1:3000/invoices/6
+ http://127.0.0.1:3000/invoices/6 `GET`
 
  `response` 
  ```json
@@ -146,7 +146,7 @@
 }
 ```
 
-##### Update invoice trade
+##### Update invoice trade `GET`
  http://127.0.0.1:3000/invoices/6/update?action=approve
 ** You can set the action to either "approve" or "reject" **
 
