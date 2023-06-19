@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"sync"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/khelechy/invoice-trading/pkg/common/models"
@@ -193,8 +194,9 @@ func (h handler) UpdateTrade(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusBadRequest).JSON("Trade has been updated")
 }
 
-func ProcessBid(db *gorm.DB, bidRequest models.Bid) {
+func ProcessBid(db *gorm.DB, bidRequest models.Bid, m *sync.Mutex) {
 	//lock thread
+	m.Lock()
 
 	//revalidate invoice status
 	invoice, err := models.GetInvoice(db, bidRequest.InvoiceId)
@@ -237,5 +239,6 @@ func ProcessBid(db *gorm.DB, bidRequest models.Bid) {
 	db.Save(&invoice)
 
 	//unlock thread
+	m.Unlock()
 
 }

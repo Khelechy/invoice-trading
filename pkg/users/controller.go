@@ -48,7 +48,7 @@ func (h handler) GetIssuer(c *fiber.Ctx) error {
 	if err != nil {
 		fmt.Println(err)
 	}
-	
+
 	user, err := models.GetIssuer(h.DB, uint(userId))
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, err.Error())

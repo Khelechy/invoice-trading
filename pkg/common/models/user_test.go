@@ -53,7 +53,7 @@ func TestGetInvestor(t *testing.T){
 	got, err := GetInvestor(db, 1)
 
 	if err != nil {
-		t.Errorf("Error get inbestor: %v\n", err)
+		t.Errorf("Error get investor: %v\n", err)
 	}
 
 	if got.Name != want {

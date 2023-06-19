@@ -31,7 +31,9 @@ func CreateInvoice(db *gorm.DB, invoice Invoice) (*Invoice, error) {
 func GetInvoice(db *gorm.DB, id uint) (*Invoice, error) {
 	var invoice Invoice
 
-	err := db.Model(&Invoice{}).Where("id = ?", id).Preload("Bids.Investor").First(&invoice).Error
+	err := db.Model(&Invoice{}).Where("id = ?", id).Preload("Bids.Investor", func(tx *gorm.DB) *gorm.DB {
+		return tx.Omit("Balance")
+	}).First(&invoice).Error
 	if err != nil {
 		return nil, err
 	}

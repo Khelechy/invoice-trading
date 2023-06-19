@@ -7,7 +7,7 @@ DB_NAME_TEST=${1:-invoicedbbtest}
 DB_USER=${2:-invoicedbuser}
 DB_USER_PASS=${3:-password}
 
-postgres <<EOF
+sudo su postgres <<EOF
 createdb  $DB_NAME;
 createdb  $DB_NAME_TEST;
 psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_USER_PASS';"

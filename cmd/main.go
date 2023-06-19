@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"sync"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -15,6 +16,7 @@ import (
 
 func main() {
 	c, err := config.LoadConfig()
+	var m sync.Mutex
 
 	if err != nil {
 		log.Fatalln("Failed at config", err)
@@ -33,13 +35,13 @@ func main() {
 	invoices.RegisterRoutes(app, db, jobChan)
 	users.RegisterRoutes(app, db)
 
-	go worker(db, jobChan)
+	go worker(db, jobChan, &m)
 
 	app.Listen(c.Port)
 }
 
-func worker(db *gorm.DB, jobChan <-chan models.Bid) {
+func worker(db *gorm.DB, jobChan <-chan models.Bid, m *sync.Mutex) {
 	for job := range jobChan {
-		invoices.ProcessBid(db, job)
+		invoices.ProcessBid(db, job, m)
 	}
 }
